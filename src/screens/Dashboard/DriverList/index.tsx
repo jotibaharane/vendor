@@ -1,10 +1,11 @@
-// DriverList.tsx
+// DriverList.tsx - With toggle for discontinue button visibility
 import { getDrivers } from '@api/endpoints/driver.api';
 import Icon from '@react-native-vector-icons/material-design-icons';
 import { RootState } from '@store/index';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   RefreshControl,
   Text,
@@ -24,6 +25,11 @@ const DriverList = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [discontinuingDriverId, setDiscontinuingDriverId] = useState<
+    string | null
+  >(null);
+  const [showDiscontinueButtons, setShowDiscontinueButtons] =
+    useState<boolean>(false);
 
   const vendorId = useSelector((state: RootState) => state?.auth?.token);
 
@@ -71,8 +77,76 @@ const DriverList = () => {
     }
   }, [searchQuery, driverData]);
 
+  // Handle individual driver discontinuation
+  const handleDiscontinue = (driverId: string) => {
+    const driver = driverData.find(d => d.driver_id === driverId);
+    const driverName = driver?.DriverDetails?.full_name || 'This driver';
+
+    Alert.alert(
+      'Discontinue Driver',
+      `Are you sure you want to discontinue ${driverName}?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => setDiscontinuingDriverId(null),
+        },
+        {
+          text: 'Discontinue',
+          style: 'destructive',
+          onPress: () => confirmDiscontinue(driverId, driverName),
+        },
+      ],
+    );
+  };
+
+  // Confirm and process discontinuation
+  const confirmDiscontinue = async (driverId: string, driverName: string) => {
+    try {
+      setDiscontinuingDriverId(driverId);
+
+      // const response = await discontinueDriver({
+      //   driver_id: driverId,
+      //   vendorid: vendorId
+      // });
+
+      // if (response?.status === '00') {
+      // Update local state immediately for better UX
+      //   setDriverData(prevData =>
+      //     prevData.map(driver =>
+      //       driver.driver_id === driverId
+      //         ? { ...driver, is_discontinued: true }
+      //         : driver
+      //     )
+      //   );
+
+      //   setFilteredDrivers(prevData =>
+      //     prevData.map(driver =>
+      //       driver.driver_id === driverId
+      //         ? { ...driver, is_discontinued: true }
+      //         : driver
+      //     )
+      //   );
+
+      //   Alert.alert('Success', `${driverName} has been discontinued.`);
+      // } else {
+      //   Alert.alert('Error', 'Failed to discontinue driver. Please try again.');
+      // }
+    } catch (error) {
+      console.log('Discontinue error:', error);
+      Alert.alert('Error', 'Failed to discontinue driver. Please try again.');
+    } finally {
+      setDiscontinuingDriverId(null);
+    }
+  };
+
   const onRefresh = () => {
     fetchData(true);
+  };
+
+  // Toggle discontinue button visibility
+  const toggleDiscontinueMode = () => {
+    setShowDiscontinueButtons(!showDiscontinueButtons);
   };
 
   return (
@@ -81,22 +155,52 @@ const DriverList = () => {
         {/* Header with Add Button */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Registered Drivers</Text>
-          <Button
-            mode="contained"
-            onPress={() => setModalVisible(true)}
-            style={styles.addButton}
-            icon="plus"
-            compact
-          >
-            Add Driver
-          </Button>
+          <View style={styles.headerActions}>
+            <Button
+              mode="contained"
+              onPress={() => setModalVisible(true)}
+              style={styles.addButton}
+              compact
+            >
+              Add Driver
+            </Button>
+            <Button
+              mode="contained"
+              onPress={toggleDiscontinueMode}
+              style={[
+                styles.addButton,
+                styles.discontinueToggleButton,
+                !showDiscontinueButtons
+                  ? { backgroundColor: '#e74c3c' }
+                  : { backgroundColor: '#13e91a' },
+              ]}
+              compact
+            >
+              {showDiscontinueButtons ? 'Cancel' : 'Discontinue'}
+            </Button>
+          </View>
         </View>
+
+        {/* Discontinue Mode Instructions */}
+        {showDiscontinueButtons && (
+          <View style={styles.discontinueInstructions}>
+            <Icon name="information" size={20} color="#f39c12" />
+            <Text style={styles.instructionsText}>
+              Click the Discontinue button on any driver card to remove them
+              from active service.
+            </Text>
+          </View>
+        )}
 
         {/* Search Field */}
         <View style={styles.searchContainer}>
           <TextInput
             mode="outlined"
-            placeholder="Search by name, phone or license..."
+            placeholder={
+              showDiscontinueButtons
+                ? 'Search drivers to discontinue...'
+                : 'Search by name, phone or license...'
+            }
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={styles.searchInput}
@@ -160,7 +264,14 @@ const DriverList = () => {
           <FlatList
             data={filteredDrivers}
             keyExtractor={item => item.driver_id}
-            renderItem={({ item }) => <DriverCard item={item} />}
+            renderItem={({ item }) => (
+              <DriverCard
+                item={item}
+                onDiscontinue={handleDiscontinue}
+                isDiscontinuing={discontinuingDriverId === item.driver_id}
+                showDiscontinueButton={showDiscontinueButtons}
+              />
+            )}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
             refreshControl={

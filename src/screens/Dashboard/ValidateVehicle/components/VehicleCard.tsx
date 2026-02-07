@@ -1,175 +1,244 @@
 // VehicleCard.tsx
-import Icon from '@react-native-vector-icons/material-design-icons';
 import { ValidationResult } from '@store/slices/validatedVehiclesSlice';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card, Text } from 'react-native-paper';
+import { Button, Card, Text, TextInput } from 'react-native-paper';
 import { getStatusConfig } from '../helper';
 import { VehicleItem } from '../type';
 
-interface VehicleCardProps {
+interface Props {
   item: VehicleItem;
   validatingId: string | null;
   handleValidate: (vehicle: VehicleItem) => void;
   validationStatus?: ValidationResult;
 }
 
-export const VehicleCard: React.FC<VehicleCardProps> = ({
-  item,
-  validatingId,
-  handleValidate,
-  validationStatus,
-}) => {
-  const statusConfig = getStatusConfig(validationStatus);
-  const isVerified = validationStatus?.status === 'success';
-  const isFailed = validationStatus?.status === 'failed';
-  const isCurrentlyValidating = validatingId === item.VehicleNumber;
-
-  // Only show validate button for vehicles that haven't been validated yet
-  // (no validation status or pending status)
-  const canValidate =
-    !validationStatus || validationStatus.status === 'pending';
-
-  return (
-    <Card style={styles.card} elevation={2}>
-      <Card.Content>
-        <View style={styles.cardContent}>
-          <View style={styles.vehicleMainInfo}>
-            <Text style={styles.vehicleNo}>{item.VehicleNumber}</Text>
-
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: statusConfig.backgroundColor },
-              ]}
-            >
-              <Icon
-                name={statusConfig.icon}
-                size={16}
-                color={statusConfig.color}
-              />
-              <Text style={[styles.statusText, { color: statusConfig.color }]}>
-                {statusConfig.text}
+export const VehicleCard: React.FC<Props> = React.memo(
+  ({ item, validatingId, handleValidate, validationStatus }) => {
+    const status = getStatusConfig(validationStatus);
+    const loading = validatingId === item.VehicleNumber;
+    console.log({ item });
+    return (
+      <Card style={styles.card} elevation={1}>
+        <Card.Content style={styles.content}>
+          {/* ROW 1: Header with ID and Validate button */}
+          {/* <View style={styles.headerRow}>
+            <View style={styles.headerLeft}>
+              <Text variant="titleMedium" style={styles.vehicleId}>
+                {item.VehicleNumber}
               </Text>
-            </View>
-
-            {statusConfig.description && (
-              <Text style={styles.statusDescription}>
-                {statusConfig.description}
-              </Text>
-            )}
-          </View>
-
-          {canValidate && !isCurrentlyValidating ? (
-            <Button
-              mode="contained"
-              onPress={() => handleValidate(item)}
-              style={styles.validateButton}
-              labelStyle={styles.validateButtonText}
-              icon="check-decagram"
-            >
-              Validate
-            </Button>
-          ) : (
-            <View style={styles.statusIndicator}>
-              {isCurrentlyValidating ? (
-                <Button
-                  mode="outlined"
-                  style={styles.validatingButton}
-                  labelStyle={styles.validatingButtonText}
-                  icon="loading"
-                  disabled
+              {status.text && (
+                <Chip
+                  compact
+                  icon={status.icon}
+                  style={[styles.statusChip, { borderColor: status.color }]}
+                  textStyle={[styles.statusText, { color: status.color }]}
                 >
-                  Validating...
-                </Button>
-              ) : (
-                <View style={styles.verifiedBadge}>
-                  <Icon
-                    name={
-                      isVerified
-                        ? 'check-circle'
-                        : isFailed
-                        ? 'alert-circle'
-                        : 'clock-alert'
-                    }
-                    size={24}
-                    color={
-                      isVerified ? '#2ecc71' : isFailed ? '#e74c3c' : '#e67e22'
-                    }
-                  />
-                </View>
+                  {status.text}
+                </Chip>
               )}
             </View>
-          )}
-        </View>
-      </Card.Content>
-    </Card>
-  );
-};
+            <View>
+              <Button
+                mode="contained"
+                compact
+                loading={loading}
+                onPress={() => handleValidate(item)}
+                style={styles.validateBtn}
+                // contentStyle={styles.btnContent}
+                labelStyle={styles.btnLabel}
+              >
+                Validate
+              </Button>
+            </View>
+          </View> */}
 
+          {/* ROW 2: Input fields */}
+          <View style={styles.inputsRow}>
+            <View style={styles.inputGroup}>
+              <FieldWithLabel
+                label="Vehicle No"
+                placeholder="kg"
+                keyboardType="numeric"
+                value={item.VehicleNumber}
+              />
+              <FieldWithLabel
+                label="Weight"
+                placeholder="kg"
+                keyboardType="numeric"
+              />
+              <FieldWithLabel label="Segment" />
+            </View>
+            <View style={styles.inputGroup}>
+              <FieldWithLabel label="Body Type" style={{ marginTop: 12 }} />
+              <View style={styles.dimensionsGroup}>
+                <View style={styles.dimensionsHeader}>
+                  <Text variant="labelSmall" style={styles.dimensionsLabel}>
+                    Dimensions
+                  </Text>
+                </View>
+                <View style={styles.dimensionsInputs}>
+                  <CompactField placeholder="W" keyboardType="numeric" />
+                  <Text style={styles.divider}>×</Text>
+                  <CompactField placeholder="H" keyboardType="numeric" />
+                  <Text style={styles.divider}>×</Text>
+                  <CompactField placeholder="L" keyboardType="numeric" />
+                </View>
+              </View>
+            </View>
+            <View>
+              <Button
+                mode="contained"
+                compact
+                loading={loading}
+                onPress={() => handleValidate(item)}
+                style={styles.validateBtn}
+                // contentStyle={styles.btnContent}
+                labelStyle={styles.btnLabel}
+              >
+                Validate
+              </Button>
+            </View>
+          </View>
+        </Card.Content>
+      </Card>
+    );
+  },
+);
+
+// Subcomponents
+const FieldWithLabel = ({ label, ...props }: any) => (
+  <View style={styles.fieldContainer}>
+    {/* <Text variant="labelSmall" style={styles.fieldLabel}>
+      {label}
+    </Text> */}
+    <TextInput
+      mode="outlined"
+      label={label}
+      dense
+      style={styles.fieldInput}
+      contentStyle={styles.fieldInputContent}
+      outlineStyle={styles.fieldOutline}
+      {...props}
+    />
+  </View>
+);
+
+const CompactField = ({ ...props }: any) => (
+  <TextInput
+    mode="outlined"
+    dense
+    style={styles.compactInput}
+    contentStyle={styles.compactInputContent}
+    outlineStyle={styles.compactOutline}
+    {...props}
+  />
+);
+
+// Styles
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginBottom: 12,
-    overflow: 'hidden',
+    marginHorizontal: 8,
+    marginVertical: 6,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
   },
-  cardContent: {
+  content: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  vehicleMainInfo: {
-    flex: 1,
-    marginRight: 12,
-  },
-  vehicleNo: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#2c3e50',
-    marginBottom: 8,
-  },
-  statusBadge: {
+  headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginBottom: 4,
+    gap: 8,
+  },
+  vehicleId: {
+    fontWeight: '700',
+    color: '#1f2937',
+  },
+  statusChip: {
+    borderWidth: 1,
+    backgroundColor: 'transparent',
   },
   statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 4,
+    // fontSize: 10,
+    // fontWeight: '600',
   },
-  statusDescription: {
+  validateBtn: {
+    borderRadius: 6,
+    minWidth: 80,
+  },
+  btnContent: {
+    height: 32,
+  },
+  btnLabel: {
     fontSize: 11,
-    color: '#7f8c8d',
-    marginTop: 2,
-  },
-  validateButton: {
-    backgroundColor: '#3498db',
-    borderRadius: 8,
-    minWidth: 100,
-  },
-  validatingButton: {
-    borderColor: '#3498db',
-    minWidth: 120,
-  },
-  validatingButtonText: {
-    fontSize: 12,
-    color: '#3498db',
-  },
-  validateButtonText: {
-    fontSize: 12,
     fontWeight: '600',
   },
-  statusIndicator: {
-    justifyContent: 'center',
-    alignItems: 'center',
+  inputsRow: {
+    gap: 12,
   },
-  verifiedBadge: {
-    padding: 4,
+  inputGroup: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  fieldContainer: {
+    flex: 1,
+  },
+  fieldLabel: {
+    marginBottom: 4,
+    color: '#6b7280',
+    fontWeight: '500',
+  },
+  fieldInput: {
+    height: 38,
+  },
+  fieldInputContent: {
+    fontSize: 11.5,
+    paddingVertical: 0,
+  },
+  fieldOutline: {
+    borderRadius: 6,
+  },
+  dimensionsGroup: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
+    // padding: 10,
+  },
+  dimensionsHeader: {
+    marginBottom: 6,
+  },
+  dimensionsLabel: {
+    color: '#475569',
+    fontWeight: '600',
+  },
+  dimensionsInputs: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  compactInput: {
+    width: 60,
+    height: 36,
+  },
+  compactInputContent: {
+    fontSize: 13,
+    textAlign: 'center',
+    paddingVertical: 0,
+  },
+  compactOutline: {
+    borderRadius: 5,
+  },
+  divider: {
+    fontSize: 12,
+    color: '#94a3b8',
+    fontWeight: '500',
   },
 });

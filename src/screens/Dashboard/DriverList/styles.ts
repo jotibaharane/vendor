@@ -79,4 +79,51 @@ export const styles = StyleSheet.create({
   listContent: {
     padding: 16,
   },
+
+  discontinueActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+
+  discontinueButton: {
+    borderColor: '#e74c3c',
+  },
+
+  cancelButton: {
+    borderColor: '#95a5a6',
+  },
+
+  confirmDiscontinueButton: {
+    backgroundColor: '#e74c3c',
+  },
+
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+
+  discontinueToggleButton: {
+    // borderColor: '#e74c3c',
+  },
+
+  discontinueToggleButtonActive: {
+    // backgroundColor: '#e74c3c',
+  },
+
+  discontinueInstructions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff3cd',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    marginTop: 4,
+  },
+
+  instructionsText: {
+    marginLeft: 8,
+    color: '#856404',
+    fontSize: 14,
+    flex: 1,
+  },
 });
