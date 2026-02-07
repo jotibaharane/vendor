@@ -1,20 +1,13 @@
 import React, { FC } from 'react';
-import ActiveTripsModal from './components/ActiveTripsModal';
-import CompleteTripsModal from './components/CompleteTripsModal';
-import IdleDriversModal from './components/IdleDriversModal';
 import MapTab from './components/MapTab';
-import ProcessDriversModal from './components/ProcessDriversModal';
-import TabSelector from './components/TabSelector';
+import PostListModal from './components/postList';
 
 const SecondScreen: FC<any> = () => {
   return (
     <>
-      <TabSelector />
+      {/* <TabSelector /> */}
       <MapTab />
-      <IdleDriversModal />
-      <ProcessDriversModal />
-      <ActiveTripsModal />
-      <CompleteTripsModal />
+      <PostListModal />
     </>
   );
 };

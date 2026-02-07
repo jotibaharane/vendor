@@ -23,7 +23,6 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
   const statusConfig = getStatusConfig(validationStatus);
   const isVerified = validationStatus?.status === 'success';
   const isFailed = validationStatus?.status === 'failed';
-  const isPendingValidation = validationStatus?.status === 'pending';
   const isCurrentlyValidating = validatingId === item.VehicleNumber;
 
   // Only show validate button for vehicles that haven't been validated yet

@@ -44,10 +44,10 @@ export const api = createApi({
         return {
           ...response,
           data: response.data
-            .filter(item => item.state && item.state !== 'NA') // optional: remove invalid entries
+            .filter(item => item.state && item.state !== 'NA')
             .map(item => ({
               label: item.state.trim(),
-              value: item.state.trim(), // or use a code if you have one later
+              value: item.state.trim(),
             })),
         };
       },
@@ -73,10 +73,10 @@ export const api = createApi({
         return {
           ...response,
           data: response.data
-            .filter(item => item?.district && item?.district !== 'NA') // optional: remove invalid entries
+            .filter(item => item?.district && item?.district !== 'NA')
             .map(item => ({
               label: item?.district?.trim(),
-              value: item?.district?.trim(), // or use a code if you have one later
+              value: item?.district?.trim(),
             })),
         };
       },
@@ -278,6 +278,23 @@ export const api = createApi({
         body: queryArg,
       }),
     }),
+    getPostsList: builder.mutation<
+      any,
+      {
+        LPStatus: any;
+        VendorID: string;
+        DriverID: string;
+        Search: string;
+        pageNumber: number;
+        pageSize: number;
+      }
+    >({
+      query: queryArg => ({
+        url: `/get_vendor_status`,
+        method: 'POST',
+        body: queryArg,
+      }),
+    }),
   }),
 });
 
@@ -295,6 +312,7 @@ export const {
   useValidateBankMutation,
   useNearestCustomerPostsMutation,
   useGetAssignedVehiclesMutation,
+  useGetPostsListMutation,
 } = api;
 
 export default api;
