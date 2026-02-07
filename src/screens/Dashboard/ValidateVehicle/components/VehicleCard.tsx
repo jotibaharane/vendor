@@ -21,39 +21,6 @@ export const VehicleCard: React.FC<Props> = React.memo(
     return (
       <Card style={styles.card} elevation={1}>
         <Card.Content style={styles.content}>
-          {/* ROW 1: Header with ID and Validate button */}
-          {/* <View style={styles.headerRow}>
-            <View style={styles.headerLeft}>
-              <Text variant="titleMedium" style={styles.vehicleId}>
-                {item.VehicleNumber}
-              </Text>
-              {status.text && (
-                <Chip
-                  compact
-                  icon={status.icon}
-                  style={[styles.statusChip, { borderColor: status.color }]}
-                  textStyle={[styles.statusText, { color: status.color }]}
-                >
-                  {status.text}
-                </Chip>
-              )}
-            </View>
-            <View>
-              <Button
-                mode="contained"
-                compact
-                loading={loading}
-                onPress={() => handleValidate(item)}
-                style={styles.validateBtn}
-                // contentStyle={styles.btnContent}
-                labelStyle={styles.btnLabel}
-              >
-                Validate
-              </Button>
-            </View>
-          </View> */}
-
-          {/* ROW 2: Input fields */}
           <View style={styles.inputsRow}>
             <View style={styles.inputGroup}>
               <FieldWithLabel
@@ -93,7 +60,6 @@ export const VehicleCard: React.FC<Props> = React.memo(
                 loading={loading}
                 onPress={() => handleValidate(item)}
                 style={styles.validateBtn}
-                // contentStyle={styles.btnContent}
                 labelStyle={styles.btnLabel}
               >
                 Validate
@@ -109,9 +75,6 @@ export const VehicleCard: React.FC<Props> = React.memo(
 // Subcomponents
 const FieldWithLabel = ({ label, ...props }: any) => (
   <View style={styles.fieldContainer}>
-    {/* <Text variant="labelSmall" style={styles.fieldLabel}>
-      {label}
-    </Text> */}
     <TextInput
       mode="outlined"
       label={label}
